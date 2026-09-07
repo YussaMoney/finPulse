@@ -159,15 +159,6 @@ function App() {
           setSortBy={setSortBy}
         />
 
-        {/* <SearchBar search={search} setSearch={setSearch} />
-        <div className="flex-container">
-          <CategoryFilter
-            selectedCategory={selectedCategory}
-            setSelectedCategory={setSelectedCategory}
-          />
-          <SortedDropdown sortBy={sortBy} setSortBy={setSortBy} />
-        </div> */}
-
         <TransactionList
           transactions={sortedDropdown}
           totalTransactions={transactions.length}
