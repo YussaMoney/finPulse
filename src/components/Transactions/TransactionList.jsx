@@ -8,8 +8,22 @@ export default function TransactionList({
   totalTransactions,
 }) {
   return (
-    <section className="box">
-      <h2 className="history">Transaction History</h2>
+    <section className="box transaction-history">
+      <div className="history-header">
+        <div>
+          <h2 className="history-title">Transaction History</h2>
+          <p className="history-subtitle">
+            Track every income and expense in one place.
+          </p>
+        </div>
+
+        <div className="history-count">
+          <span>{transactions.length}</span>
+          <small>
+            {transactions.length === 1 ? "Transaction" : "Transactions"}
+          </small>
+        </div>
+      </div>
       <motion.ul
         variants={listVariants}
         initial="hidden"
