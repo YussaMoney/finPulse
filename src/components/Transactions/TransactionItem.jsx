@@ -18,7 +18,7 @@ export default function TransactionItem({
       variants={transactionVariants}
       whileHover={{
         y: -4,
-        scale: 1.01,
+        transition: { duration: 0.18 },
       }}
       initial={{ opacity: 0, x: -20 }}
       animate={{ opacity: 1, x: 0 }}
@@ -29,26 +29,27 @@ export default function TransactionItem({
         transaction.amount > 0 ? "income" : "expense"
       }`}
     >
-      <div className="categoryWithDesc">
+      <div className="transaction-info">
         <div
           className={`transaction-category ${transaction.amount > 0 ? "trend-up" : "trend-down"}`}
         >
-          {/* {categories.map((category) =>
-            category.title === transaction.category ? category.icon : null,
-          )} */}
           {categoryMap[transaction.category]}
         </div>
         <div className="transaction-description">
           <h4 className="description-title">{transaction.description}</h4>
-          <p className="description-date">
+          {/* <p className="description-date">
             <i>{transaction.date ? transaction.date : "No Date"}</i>
+          </p> */}
+          <p className="description-meta">
+            {transaction.category} • {transaction.date || "No Date"}
           </p>
         </div>
       </div>
 
-      <div className="editBtnWithDeletBtn">
+      <div className="transaction-actions">
         <div className="transaction-amount">
-          ₦{Math.abs(transaction.amount).toLocaleString()}
+          {transaction.amount > 0 ? "+" : "-"}₦
+          {Math.abs(transaction.amount).toLocaleString()}
         </div>
         <button
           type="button"
@@ -56,7 +57,6 @@ export default function TransactionItem({
           title="Edit Transaction"
           onClick={() => handleEdit(transaction)}
         >
-          <FontAwesomeIcon />
           <FontAwesomeIcon icon={faPen} size="xl" />
         </button>
         <button

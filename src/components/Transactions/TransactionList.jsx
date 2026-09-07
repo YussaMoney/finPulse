@@ -31,22 +31,21 @@ export default function TransactionList({
         className="transaction-list"
       >
         {totalTransactions === 0 ? (
-          <p>
-            📄 <br />
-            <br />
-            No transactions yet!.
-            <br />
-            <br /> Start by adding your first transaction.
-          </p>
+          <div className="empty-state">
+            <div className="empty-state-icon">📄</div>
+
+            <h3>No transactions yet</h3>
+
+            <p>Start by adding your first transaction.</p>
+          </div>
         ) : transactions.length === 0 ? (
-          <p>
-            🔍 <br />
-            <br />
-            No transactions found.
-            <br />
-            <br />
-            Try another search term.
-          </p>
+          <div className="empty-state">
+            <div className="empty-state-icon">🔍</div>
+
+            <h3>No transactions found</h3>
+
+            <p>Try another search term or category.</p>
+          </div>
         ) : (
           <AnimatePresence>
             {transactions.map((transaction) => (

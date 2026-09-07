@@ -383,8 +383,6 @@ body {
   font-size: 0.8rem;
 }
 
-/* Amount and actions */
-
 .transaction-actions {
   display: flex;
   align-items: center;
@@ -407,6 +405,45 @@ body {
 
 .transaction-item.expense .transaction-amount {
   color: var(--red);
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  padding: 3rem 1rem;
+
+  text-align: center;
+}
+
+.empty-state-icon {
+  width: 64px;
+  height: 64px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  margin-bottom: 1rem;
+
+  border-radius: 18px;
+
+  background: #eff6ff;
+
+  font-size: 1.8rem;
+}
+
+.empty-state h3 {
+  color: #0f172a;
+  font-size: 1.1rem;
+  margin-bottom: 0.4rem;
+}
+
+.empty-state p {
+  color: #64748b;
+  font-size: 0.9rem;
 }
 
 .button {
