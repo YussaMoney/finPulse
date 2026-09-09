@@ -11,6 +11,7 @@ import formatDate from "./utils/formatDate";
 import toast from "react-hot-toast";
 import SearchToolbar from "./components/Transactions/SearchToolbar";
 import IncomeExpenseChart from "./components/Analytics/IncomeExpenseChart";
+import ExpenseCategoryChart from "./components/Analytics/ExpenseCategoryChart";
 
 function App() {
   const [description, setDescription] = useState("");
@@ -161,6 +162,8 @@ function App() {
         />
 
         <IncomeExpenseChart transactions={transactions} />
+
+        <ExpenseCategoryChart transactions={transactions} />
 
         <TransactionList
           transactions={sortedDropdown}

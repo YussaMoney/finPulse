@@ -14,5 +14,14 @@ export function getIncomeExpenseTotals(transactions) {
 }
 
 export function getCategoryTotals(transactions) {
-  // We'll implement this later.
+  return transactions
+    .filter((transaction) => transaction.amount < 0)
+    .reduce((totals, transaction) => {
+      const category = transaction.category;
+
+      totals[category] = (totals[category] || 0) + Math.abs(transaction.amount);
+      console.log("Category totals:", totals);
+
+      return totals;
+    }, {});
 }
