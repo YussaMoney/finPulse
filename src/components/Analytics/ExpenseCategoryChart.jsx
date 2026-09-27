@@ -1,7 +1,24 @@
-import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
+import {
+  PieChart,
+  Pie,
+  Cell,
+  Legend,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
 
+import AnalyticsCard from "./AnalyticsCard";
 import { getCategoryTotals } from "../../utils/chartData";
 import formatCurrency from "../../utils/formatCurrency";
+
+const CATEGORY_COLORS = [
+  "#3b82f6",
+  "#f59e0b",
+  "#8b5cf6",
+  "#06b6d4",
+  "#ec4899",
+  "#84cc16",
+];
 
 export default function ExpenseCategoryChart({ transactions }) {
   const categoryTotals = getCategoryTotals(transactions);
@@ -12,14 +29,10 @@ export default function ExpenseCategoryChart({ transactions }) {
   }));
 
   return (
-    <section className="analytics">
-      <div className="analytics-header">
-        <div>
-          <h2>Expenses by Category</h2>
-          <p>See where your money is going</p>
-        </div>
-      </div>
-
+    <AnalyticsCard
+      title="Income vs Expenses"
+      description="Overview of your financial activity"
+    >
       {chartData.length === 0 ? (
         <p className="analytics-empty">
           No expenses yet. Add an expense to see your spending breakdown.
@@ -33,22 +46,23 @@ export default function ExpenseCategoryChart({ transactions }) {
                 dataKey="amount"
                 nameKey="name"
                 cx="50%"
-                cy="50%"
-                outerRadius={100}
+                cy="45%"
+                outerRadius="65%"
               >
                 {chartData.map((entry, index) => (
                   <Cell
                     key={entry.name}
-                    fill={`hsl(${index * 60}, 70%, 50%)`}
+                    fill={CATEGORY_COLORS[index % CATEGORY_COLORS.length]}
                   />
                 ))}
               </Pie>
 
               <Tooltip formatter={(value) => formatCurrency(value)} />
+              <Legend />
             </PieChart>
           </ResponsiveContainer>
         </div>
       )}
-    </section>
+    </AnalyticsCard>
   );
 }

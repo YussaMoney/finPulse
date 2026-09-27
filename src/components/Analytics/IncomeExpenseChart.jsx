@@ -10,6 +10,7 @@ import {
   LabelList,
 } from "recharts";
 
+import AnalyticsCard from "./AnalyticsCard";
 import formatCurrency from "../../utils/formatCurrency";
 import { getIncomeExpenseTotals } from "../../utils/chartData";
 
@@ -28,14 +29,10 @@ export default function IncomeExpenseChart({ transactions }) {
   ];
 
   return (
-    <section className="analytics">
-      <div className="analytics-header">
-        <div>
-          <h2>Income vs Expenses</h2>
-          <p>Overview of your financial activity</p>
-        </div>
-      </div>
-
+    <AnalyticsCard
+      title="Income vs Expenses"
+      description="Overview of your financial activity"
+    >
       {transactions.length === 0 ? (
         <p className="analytics-empty">
           No transactions yet. Add a transaction to see your income and
@@ -105,6 +102,6 @@ export default function IncomeExpenseChart({ transactions }) {
           </ResponsiveContainer>
         </div>
       )}
-    </section>
+    </AnalyticsCard>
   );
 }
