@@ -3,15 +3,12 @@ import "../src/style.css";
 import TransactionList from "./components/Transactions/TransactionList";
 import DashboardStats from "./components/DashboardStats";
 import TransactionForm from "./components/TransactionForm";
-// import SearchBar from "./components/SearchBar";
-// import CategoryFilter from "./components/CategoryFilter";
-// import SortedDropdown from "./components/SortedDropdown";
+
 import formatDescription from "./utils/formatDescription";
 import formatDate from "./utils/formatDate";
 import toast from "react-hot-toast";
 import SearchToolbar from "./components/Transactions/SearchToolbar";
-import IncomeExpenseChart from "./components/Analytics/IncomeExpenseChart";
-import ExpenseCategoryChart from "./components/Analytics/ExpenseCategoryChart";
+import Analytics from "./components/Analytics/Analytics";
 
 function App() {
   const [description, setDescription] = useState("");
@@ -161,9 +158,7 @@ function App() {
           setSortBy={setSortBy}
         />
 
-        <IncomeExpenseChart transactions={transactions} />
-
-        <ExpenseCategoryChart transactions={transactions} />
+        <Analytics transactions={transactions} />
 
         <TransactionList
           transactions={sortedDropdown}
