@@ -9,6 +9,7 @@ import formatDate from "./utils/formatDate";
 import toast from "react-hot-toast";
 import SearchToolbar from "./components/Transactions/SearchToolbar";
 import Analytics from "./components/Analytics/Analytics";
+import createTransaction from "./utils/createTransaction";
 
 function App() {
   const [description, setDescription] = useState("");
@@ -40,14 +41,15 @@ function App() {
       toast.error("Please enter both description and amount.");
       return;
     }
+
     const date = formatDate();
-    const newTransaction = {
-      id: Date.now(),
+    const newTransaction = createTransaction({
       date,
       description: formatDescription(description),
       amount: parseFloat(amount),
       category,
-    };
+    });
+
     setTransactions((prevTransactions) => [
       ...prevTransactions,
       newTransaction,
