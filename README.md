@@ -99,7 +99,7 @@ Contributions are welcome. If you would like to improve the app, feel free to op
 **Azeez Yusuf O.**
 
 - GitHub: [@YussaMoney](https://github.com/YussaMoney)
-- X: [@YussaMoney](https://x.com/0xyussa)
+- X: [@Yussassiph](https://x.com/Yussassiph)
 - LinkedIn: [@YussaMoney](https://www.linkedin.com/in/yussamoney)
 
 ## 📧 Contact
