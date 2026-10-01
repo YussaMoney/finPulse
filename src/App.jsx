@@ -11,6 +11,7 @@ import SettingsView from "./components/SettingsView";
 import formatDescription from "./utils/formatDescription";
 import formatDate from "./utils/formatDate";
 import createTransaction from "./utils/createTransaction";
+import { convertAmount } from "./utils/convertCurrency";
 import toast, { Toaster } from "react-hot-toast";
 import { Sun, Moon } from "lucide-react";
 
@@ -39,8 +40,27 @@ function App() {
   function toggleTheme() {
     setTheme((prev) => {
       const nextTheme = prev === "dark" ? "light" : "dark";
-      toast.success(`Switched to ${nextTheme === "dark" ? "Dark Mode 🌙" : "Light Mode ☀️"}`);
+      toast.success(
+        `Switched to ${nextTheme === "dark" ? "Dark Mode 🌙" : "Light Mode ☀️"}`,
+        { id: "theme-toast" }
+      );
       return nextTheme;
+    });
+  }
+
+  function changeCurrency(newSymbol) {
+    if (newSymbol === currencySymbol) return;
+
+    setTransactions((prevTransactions) =>
+      prevTransactions.map((t) => ({
+        ...t,
+        amount: convertAmount(t.amount, currencySymbol, newSymbol),
+      }))
+    );
+
+    setCurrencySymbol(newSymbol);
+    toast.success(`Currency converted to ${newSymbol}`, {
+      id: "currency-toast",
     });
   }
 
@@ -74,7 +94,7 @@ function App() {
 
   function addTransaction(signedAmount) {
     if (!description.trim()) {
-      toast.error("Please enter a description.");
+      toast.error("Please enter a description.", { id: "tx-error" });
       return;
     }
 
@@ -87,7 +107,7 @@ function App() {
     });
 
     setTransactions((prev) => [newTransaction, ...prev]);
-    toast.success("Transaction added successfully!");
+    toast.success("Transaction added successfully!", { id: "tx-success" });
     resetForm();
     setIsDrawerOpen(false);
   }
@@ -108,14 +128,14 @@ function App() {
         return t;
       })
     );
-    toast.success("Transaction updated successfully!");
+    toast.success("Transaction updated successfully!", { id: "tx-success" });
     resetForm();
     setIsDrawerOpen(false);
   }
 
   function deleteTransaction(id) {
     setTransactions((prev) => prev.filter((t) => t.id !== id));
-    toast.success("Transaction deleted successfully!");
+    toast.success("Transaction deleted successfully!", { id: "tx-success" });
   }
 
   function handleEdit(transaction) {
@@ -128,10 +148,12 @@ function App() {
 
   function loadSampleData() {
     setTransactions(sampleTransactions);
+    toast.success("Loaded sample transactions!", { id: "data-toast" });
   }
 
   function clearAllTransactions() {
     setTransactions([]);
+    toast.success("All transactions cleared.", { id: "data-toast" });
   }
 
   const totalBalance = useMemo(() => {
@@ -143,10 +165,14 @@ function App() {
       <Toaster
         position="top-right"
         toastOptions={{
+          duration: 2500,
           style: {
             background: theme === "dark" ? "#1e293b" : "#ffffff",
             color: theme === "dark" ? "#f8fafc" : "#0f172a",
-            border: theme === "dark" ? "1px solid rgba(255,255,255,0.1)" : "1px solid rgba(15,23,42,0.1)",
+            border:
+              theme === "dark"
+                ? "1px solid rgba(255,255,255,0.1)"
+                : "1px solid rgba(15,23,42,0.1)",
             boxShadow: "0 10px 25px rgba(0,0,0,0.2)",
             borderRadius: "12px",
           },
@@ -166,14 +192,18 @@ function App() {
         <header className="dashboard-top-header">
           <div className="header-greeting">
             <h1 className="main-heading">Financial Overview</h1>
-            <p className="sub-heading">Real-time wealth tracking & expense control</p>
+            <p className="sub-heading">
+              Real-time wealth tracking & expense control
+            </p>
           </div>
 
           <button
             type="button"
             className="theme-toggle-btn"
             onClick={toggleTheme}
-            title={theme === "dark" ? "Switch to Light Mode" : "Switch to Dark Mode"}
+            title={
+              theme === "dark" ? "Switch to Light Mode" : "Switch to Dark Mode"
+            }
             aria-label="Toggle Light and Dark Mode"
           >
             {theme === "dark" ? (
@@ -193,7 +223,10 @@ function App() {
         <main className="dashboard-body">
           {activeTab === "dashboard" && (
             <>
-              <TopRowCards transactions={transactions} currencySymbol={currencySymbol} />
+              <TopRowCards
+                transactions={transactions}
+                currencySymbol={currencySymbol}
+              />
 
               <section className="main-split-area">
                 <ExpenseCategoryDonut
@@ -211,13 +244,16 @@ function App() {
           )}
 
           {activeTab === "reports" && (
-            <ReportsView transactions={transactions} currencySymbol={currencySymbol} />
+            <ReportsView
+              transactions={transactions}
+              currencySymbol={currencySymbol}
+            />
           )}
 
           {activeTab === "settings" && (
             <SettingsView
               currencySymbol={currencySymbol}
-              setCurrencySymbol={setCurrencySymbol}
+              changeCurrency={changeCurrency}
               loadSampleData={loadSampleData}
               clearAllTransactions={clearAllTransactions}
               theme={theme}

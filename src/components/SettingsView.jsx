@@ -1,9 +1,8 @@
-import { RefreshCw, Trash2, ShieldCheck, Moon, Sun, DollarSign } from "lucide-react";
-import toast from "react-hot-toast";
+import { RefreshCw, Trash2, Moon, Sun, DollarSign } from "lucide-react";
 
 export default function SettingsView({
   currencySymbol,
-  setCurrencySymbol,
+  changeCurrency,
   loadSampleData,
   clearAllTransactions,
   theme = "dark",
@@ -22,7 +21,9 @@ export default function SettingsView({
       <div className="view-header">
         <div>
           <h2 className="view-title">Dashboard Settings</h2>
-          <p className="view-subtitle">Manage workspace preferences, currency, and data management</p>
+          <p className="view-subtitle">
+            Manage workspace preferences, currency conversion, and data management
+          </p>
         </div>
       </div>
 
@@ -33,8 +34,10 @@ export default function SettingsView({
               <DollarSign size={18} className="teal-text" />
             </div>
             <div>
-              <h3 className="card-title">Currency Symbol</h3>
-              <p className="card-subtitle">Choose display currency for financial amounts</p>
+              <h3 className="card-title">Currency Symbol & Real Conversion</h3>
+              <p className="card-subtitle">
+                Switch currency and convert all entry values at real-life rates
+              </p>
             </div>
           </div>
           <div className="setting-body">
@@ -43,11 +46,10 @@ export default function SettingsView({
                 <button
                   key={c.symbol}
                   type="button"
-                  className={`currency-pill ${currencySymbol === c.symbol ? "active-pill" : ""}`}
-                  onClick={() => {
-                    setCurrencySymbol(c.symbol);
-                    toast.success(`Currency updated to ${c.name}`);
-                  }}
+                  className={`currency-pill ${
+                    currencySymbol === c.symbol ? "active-pill" : ""
+                  }`}
+                  onClick={() => changeCurrency(c.symbol)}
                 >
                   <span className="symbol-badge">{c.symbol}</span>
                   <span className="symbol-name">{c.name}</span>
@@ -60,18 +62,26 @@ export default function SettingsView({
         <div className="glass-card settings-card">
           <div className="card-header">
             <div className="setting-icon-wrapper sapphire-glow">
-              {theme === "dark" ? <Moon size={18} className="sapphire-text" /> : <Sun size={18} className="teal-text" />}
+              {theme === "dark" ? (
+                <Moon size={18} className="sapphire-text" />
+              ) : (
+                <Sun size={18} className="teal-text" />
+              )}
             </div>
             <div>
               <h3 className="card-title">Appearance Theme</h3>
-              <p className="card-subtitle">Toggle between sleek Dark and crisp Light mode</p>
+              <p className="card-subtitle">
+                Toggle between sleek Dark and crisp Light mode
+              </p>
             </div>
           </div>
           <div className="setting-body">
             <div className="theme-toggle-pills">
               <button
                 type="button"
-                className={`theme-pill ${theme === "dark" ? "active-theme" : ""}`}
+                className={`theme-pill ${
+                  theme === "dark" ? "active-theme" : ""
+                }`}
                 onClick={() => {
                   if (theme !== "dark") toggleTheme();
                 }}
@@ -81,7 +91,9 @@ export default function SettingsView({
               </button>
               <button
                 type="button"
-                className={`theme-pill ${theme === "light" ? "active-theme" : ""}`}
+                className={`theme-pill ${
+                  theme === "light" ? "active-theme" : ""
+                }`}
                 onClick={() => {
                   if (theme !== "light") toggleTheme();
                 }}
@@ -100,17 +112,16 @@ export default function SettingsView({
             </div>
             <div>
               <h3 className="card-title">Data Management</h3>
-              <p className="card-subtitle">Reset or load pre-populated test data</p>
+              <p className="card-subtitle">
+                Reset or load pre-populated test data
+              </p>
             </div>
           </div>
           <div className="setting-body button-group">
             <button
               type="button"
               className="settings-action-btn load-btn teal-glow"
-              onClick={() => {
-                loadSampleData();
-                toast.success("Loaded sample transactions!");
-              }}
+              onClick={loadSampleData}
             >
               <RefreshCw size={16} />
               <span>Reset & Load Demo Data</span>
@@ -120,9 +131,12 @@ export default function SettingsView({
               type="button"
               className="settings-action-btn clear-btn ruby-glow"
               onClick={() => {
-                if (window.confirm("Are you sure you want to clear ALL transactions?")) {
+                if (
+                  window.confirm(
+                    "Are you sure you want to clear ALL transactions?"
+                  )
+                ) {
                   clearAllTransactions();
-                  toast.success("All transactions cleared.");
                 }
               }}
             >
