@@ -12,7 +12,7 @@ import formatDescription from "./utils/formatDescription";
 import formatDate from "./utils/formatDate";
 import createTransaction from "./utils/createTransaction";
 import { convertAmount } from "./utils/convertCurrency";
-import toast, { Toaster } from "react-hot-toast";
+import toast from "react-hot-toast";
 import { Sun, Moon } from "lucide-react";
 
 function App() {
@@ -162,23 +162,6 @@ function App() {
 
   return (
     <div className="app-shell" data-theme={theme}>
-      <Toaster
-        position="top-right"
-        toastOptions={{
-          duration: 2500,
-          style: {
-            background: theme === "dark" ? "#1e293b" : "#ffffff",
-            color: theme === "dark" ? "#f8fafc" : "#0f172a",
-            border:
-              theme === "dark"
-                ? "1px solid rgba(255,255,255,0.1)"
-                : "1px solid rgba(15,23,42,0.1)",
-            boxShadow: "0 10px 25px rgba(0,0,0,0.2)",
-            borderRadius: "12px",
-          },
-        }}
-      />
-
       <Sidebar
         activeTab={activeTab}
         setActiveTab={setActiveTab}
