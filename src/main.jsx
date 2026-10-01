@@ -10,11 +10,15 @@ createRoot(document.getElementById("root")).render(
       reverseOrder={false}
       toastOptions={{
         duration: 3000,
+        className: "finpulse-toast",
         style: {
-          background: "#1f2937",
-          color: "#fff",
-          borderRadius: "10px",
-          padding: "14px",
+          background: "transparent",
+          color: "var(--text-main, #f8fafc)",
+          border: "none",
+          boxShadow: "none",
+          padding: 0,
+          fontSize: "14px",
+          fontWeight: 500,
         },
         success: {
           iconTheme: {
