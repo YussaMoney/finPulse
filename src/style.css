@@ -1787,7 +1787,6 @@ body {
   }
 }
 
-/* Custom Toast Notification Styling - Single Clean Container without inner nested border */
 .finpulse-toast,
 div[role="status"] {
   background-color: var(--toast-bg) !important;
@@ -1808,7 +1807,6 @@ div[role="status"] {
   transition: all 0.2s ease-in-out;
 }
 
-/* Remove nested inner borders and backgrounds around text content */
 div[role="status"] > div,
 .finpulse-toast > div {
   border: none !important;
@@ -1819,7 +1817,6 @@ div[role="status"] > div,
   border-radius: 0 !important;
 }
 
-/* Spacing for icon container inside toast */
 div[role="status"] > div:first-child,
 .finpulse-toast > div:first-child {
   margin-right: 4px !important;

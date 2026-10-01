@@ -1,9 +1,9 @@
 export const EXCHANGE_RATES_TO_USD = {
-  "$": 1.0,     // US Dollar
-  "€": 0.92,    // Euro
-  "£": 0.78,    // British Pound
-  "₹": 83.5,    // Indian Rupee
-  "₦": 1650.0,  // Nigerian Naira
+  "$": 1.0,
+  "€": 0.92,
+  "£": 0.78,
+  "₹": 83.5,
+  "₦": 1650.0,
 };
 
 export function convertAmount(amount, fromSymbol, toSymbol) {
@@ -14,7 +14,6 @@ export function convertAmount(amount, fromSymbol, toSymbol) {
   const amountInUSD = amount / fromRate;
   const converted = amountInUSD * toRate;
 
-  // Round NGN/INR to whole numbers or 2 decimals depending on magnitude
   if (toSymbol === "₦") {
     return Math.round(converted);
   }
