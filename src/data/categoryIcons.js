@@ -1,13 +1,14 @@
 const categoryIcons = {
+  Salary: "💼",
   Food: "🍔",
   Drink: "🍺",
   Transport: "🚌",
   Bills: "💡",
-  Salary: "💼",
   Shopping: "🛍️",
   Health: "🏥",
   Entertainment: "🎮",
   Education: "📚",
+  Other: "📦",
   Others: "📦",
 };
 
