@@ -8,7 +8,7 @@ export default function TopRowCards({ transactions = [], currencySymbol = "₦" 
     let exp = 0;
 
     const sorted = [...transactions].sort(
-      (a, b) => new Date(a.date || 0) - new Date(b.date || 0)
+      (a, b) => new Date(a.createdAt || 0) - new Date(b.createdAt || 0)
     );
 
     let runningBalance = 0;

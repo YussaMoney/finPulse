@@ -1,5 +1,5 @@
-function formatDate() {
-  return `${new Date().toLocaleString("en-NG", {
+function formatDate(date = new Date()) {
+  return `${new Date(date).toLocaleString("en-NG", {
     weekday: "short",
     day: "numeric",
     month: "short",
