@@ -2,6 +2,7 @@ import { useState, useMemo } from "react";
 import { Search, ChevronLeft, ChevronRight, Edit2, Trash2, Filter, ArrowUpDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import categories from "../data/categories";
+import formatDate from "../utils/formatDate";
 
 export default function RecentTransactionsTable({
   transactions = [],
@@ -33,10 +34,10 @@ export default function RecentTransactionsTable({
 
     switch (sortBy) {
       case "Newest":
-        list.sort((a, b) => new Date(b.date || b.id) - new Date(a.date || a.id));
+        list.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
         break;
       case "Oldest":
-        list.sort((a, b) => new Date(a.date || a.id) - new Date(b.date || b.id));
+        list.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
         break;
       case "Highest":
         list.sort((a, b) => Math.abs(b.amount) - Math.abs(a.amount));
@@ -167,7 +168,7 @@ export default function RecentTransactionsTable({
 
                   return (
                     <motion.tr
-                      key={t.id}
+                      key={t._id}
                       layout
                       initial={{ opacity: 0, y: 8 }}
                       animate={{ opacity: 1, y: 0 }}
@@ -175,7 +176,9 @@ export default function RecentTransactionsTable({
                       transition={{ duration: 0.2 }}
                       className="table-row"
                     >
-                      <td className="col-date">{t.date || "Today"}</td>
+                      <td className="col-date">
+                        {t.createdAt ? formatDate(t.createdAt) : "Today"}
+                      </td>
 
                       <td className="col-category">
                         <div
@@ -224,7 +227,7 @@ export default function RecentTransactionsTable({
                                   `Delete transaction "${t.description}"?`
                                 )
                               ) {
-                                deleteTransaction(t.id);
+                                deleteTransaction(t._id);
                               }
                             }}
                           >

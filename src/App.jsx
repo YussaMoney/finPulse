@@ -9,9 +9,8 @@ import TransactionDrawer from "./components/TransactionDrawer";
 import ReportsView from "./components/ReportsView";
 import SettingsView from "./components/SettingsView";
 import formatDescription from "./utils/formatDescription";
-import formatDate from "./utils/formatDate";
-import createTransaction from "./utils/createTransaction";
 import { convertAmount } from "./utils/convertCurrency";
+import * as transactionsApi from "./api/transactions";
 import toast from "react-hot-toast";
 import { Sun, Moon } from "lucide-react";
 
@@ -48,38 +47,46 @@ function App() {
     });
   }
 
-  function changeCurrency(newSymbol) {
+  async function changeCurrency(newSymbol) {
     if (newSymbol === currencySymbol) return;
 
-    setTransactions((prevTransactions) =>
-      prevTransactions.map((t) => ({
-        ...t,
-        amount: convertAmount(t.amount, currencySymbol, newSymbol),
-      }))
-    );
+    try {
+      const updated = await Promise.all(
+        transactions.map((t) =>
+          transactionsApi.updateTransaction(t._id, {
+            description: t.description,
+            category: t.category,
+            amount: convertAmount(t.amount, currencySymbol, newSymbol),
+          })
+        )
+      );
 
-    setCurrencySymbol(newSymbol);
-    toast.success(`Currency converted to ${newSymbol}`, {
-      id: "currency-toast",
-    });
+      setTransactions(updated);
+      setCurrencySymbol(newSymbol);
+      toast.success(`Currency converted to ${newSymbol}`, {
+        id: "currency-toast",
+      });
+    } catch (err) {
+      toast.error(err.message || "Failed to convert currency.", {
+        id: "currency-error",
+      });
+    }
   }
 
-  const [transactions, setTransactions] = useState(() => {
-    const saved = localStorage.getItem("transactions");
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
-      } catch (e) {
-        console.error("Failed to parse transactions", e);
-      }
-    }
-    return sampleTransactions;
-  });
+  const [transactions, setTransactions] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    localStorage.setItem("transactions", JSON.stringify(transactions));
-  }, [transactions]);
+    transactionsApi
+      .getTransactions()
+      .then(setTransactions)
+      .catch((err) => {
+        toast.error(err.message || "Failed to load transactions", {
+          id: "load-error",
+        });
+      })
+      .finally(() => setIsLoading(false));
+  }, []);
 
   useEffect(() => {
     localStorage.setItem("finpulse_currency", currencySymbol);
@@ -92,50 +99,57 @@ function App() {
     setEditingTransaction(null);
   }
 
-  function addTransaction(signedAmount) {
+  async function addTransaction(signedAmount) {
     if (!description.trim()) {
       toast.error("Please enter a description.", { id: "tx-error" });
       return;
     }
 
-    const date = formatDate();
-    const newTransaction = createTransaction({
-      date,
-      description: formatDescription(description),
-      amount: signedAmount,
-      category,
-    });
+    try {
+      const newTransaction = await transactionsApi.createTransaction({
+        description: formatDescription(description),
+        amount: signedAmount,
+        category,
+      });
 
-    setTransactions((prev) => [newTransaction, ...prev]);
-    toast.success("Transaction added successfully!", { id: "tx-success" });
-    resetForm();
-    setIsDrawerOpen(false);
+      setTransactions((prev) => [newTransaction, ...prev]);
+      toast.success("Transaction added successfully!", { id: "tx-success" });
+      resetForm();
+      setIsDrawerOpen(false);
+    } catch (err) {
+      toast.error(err.message || "Failed to add transaction.", { id: "tx-error" });
+    }
   }
 
-  function updateTransaction(signedAmount) {
+  async function updateTransaction(signedAmount) {
     if (!editingTransaction) return;
 
-    setTransactions((prev) =>
-      prev.map((t) => {
-        if (t.id === editingTransaction.id) {
-          return {
-            ...t,
-            description: formatDescription(description),
-            amount: signedAmount,
-            category,
-          };
-        }
-        return t;
-      })
-    );
-    toast.success("Transaction updated successfully!", { id: "tx-success" });
-    resetForm();
-    setIsDrawerOpen(false);
+    try {
+      const updated = await transactionsApi.updateTransaction(editingTransaction._id, {
+        description: formatDescription(description),
+        amount: signedAmount,
+        category,
+      });
+
+      setTransactions((prev) =>
+        prev.map((t) => (t._id === updated._id ? updated : t))
+      );
+      toast.success("Transaction updated successfully!", { id: "tx-success" });
+      resetForm();
+      setIsDrawerOpen(false);
+    } catch (err) {
+      toast.error(err.message || "Failed to update transaction.", { id: "tx-error" });
+    }
   }
 
-  function deleteTransaction(id) {
-    setTransactions((prev) => prev.filter((t) => t.id !== id));
-    toast.success("Transaction deleted successfully!", { id: "tx-success" });
+  async function deleteTransaction(id) {
+    try {
+      await transactionsApi.deleteTransaction(id);
+      setTransactions((prev) => prev.filter((t) => t._id !== id));
+      toast.success("Transaction deleted successfully!", { id: "tx-success" });
+    } catch (err) {
+      toast.error(err.message || "Failed to delete transaction.", { id: "tx-error" });
+    }
   }
 
   function handleEdit(transaction) {
@@ -146,14 +160,33 @@ function App() {
     setIsDrawerOpen(true);
   }
 
-  function loadSampleData() {
-    setTransactions(sampleTransactions);
-    toast.success("Loaded sample transactions!", { id: "data-toast" });
+  async function loadSampleData() {
+    try {
+      await Promise.all(transactions.map((t) => transactionsApi.deleteTransaction(t._id)));
+      const created = await Promise.all(
+        sampleTransactions.map((t) =>
+          transactionsApi.createTransaction({
+            description: t.description,
+            amount: t.amount,
+            category: t.category,
+          })
+        )
+      );
+      setTransactions(created);
+      toast.success("Loaded sample transactions!", { id: "data-toast" });
+    } catch (err) {
+      toast.error(err.message || "Failed to load sample data.", { id: "data-error" });
+    }
   }
 
-  function clearAllTransactions() {
-    setTransactions([]);
-    toast.success("All transactions cleared.", { id: "data-toast" });
+  async function clearAllTransactions() {
+    try {
+      await Promise.all(transactions.map((t) => transactionsApi.deleteTransaction(t._id)));
+      setTransactions([]);
+      toast.success("All transactions cleared.", { id: "data-toast" });
+    } catch (err) {
+      toast.error(err.message || "Failed to clear transactions.", { id: "data-error" });
+    }
   }
 
   const totalBalance = useMemo(() => {
@@ -204,44 +237,50 @@ function App() {
         </header>
 
         <main className="dashboard-body">
-          {activeTab === "dashboard" && (
+          {isLoading ? (
+            <p className="sub-heading">Loading transactions…</p>
+          ) : (
             <>
-              <TopRowCards
-                transactions={transactions}
-                currencySymbol={currencySymbol}
-              />
+              {activeTab === "dashboard" && (
+                <>
+                  <TopRowCards
+                    transactions={transactions}
+                    currencySymbol={currencySymbol}
+                  />
 
-              <section className="main-split-area">
-                <ExpenseCategoryDonut
+                  <section className="main-split-area">
+                    <ExpenseCategoryDonut
+                      transactions={transactions}
+                      currencySymbol={currencySymbol}
+                    />
+                    <RecentTransactionsTable
+                      transactions={transactions}
+                      deleteTransaction={deleteTransaction}
+                      handleEdit={handleEdit}
+                      currencySymbol={currencySymbol}
+                    />
+                  </section>
+                </>
+              )}
+
+              {activeTab === "reports" && (
+                <ReportsView
                   transactions={transactions}
                   currencySymbol={currencySymbol}
                 />
-                <RecentTransactionsTable
-                  transactions={transactions}
-                  deleteTransaction={deleteTransaction}
-                  handleEdit={handleEdit}
+              )}
+
+              {activeTab === "settings" && (
+                <SettingsView
                   currencySymbol={currencySymbol}
+                  changeCurrency={changeCurrency}
+                  loadSampleData={loadSampleData}
+                  clearAllTransactions={clearAllTransactions}
+                  theme={theme}
+                  toggleTheme={toggleTheme}
                 />
-              </section>
+              )}
             </>
-          )}
-
-          {activeTab === "reports" && (
-            <ReportsView
-              transactions={transactions}
-              currencySymbol={currencySymbol}
-            />
-          )}
-
-          {activeTab === "settings" && (
-            <SettingsView
-              currencySymbol={currencySymbol}
-              changeCurrency={changeCurrency}
-              loadSampleData={loadSampleData}
-              clearAllTransactions={clearAllTransactions}
-              theme={theme}
-              toggleTheme={toggleTheme}
-            />
           )}
         </main>
       </div>

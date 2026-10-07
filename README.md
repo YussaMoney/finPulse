@@ -1,16 +1,19 @@
-# 💰 React Expense Tracker
+# 💰 FinPulse
 
-A lightweight React + Vite expense tracker for managing income and spending in one place. Transactions are stored in the browser with `localStorage`, so entries remain available after refresh.
+A personal finance dashboard built with React + Vite. Track income and expenses, visualize spending by category, and manage your transactions — all stored locally in the browser with `localStorage`, so your data persists across refreshes.
 
 ## ✨ Features
 
-- Add, edit, and delete transactions
-- Track income and expenses with a live summary
-- Filter transactions by category
-- Search transactions by description
-- Sort by newest, oldest, highest amount, lowest amount, or alphabetically
-- Responsive layout for desktop and mobile screens
-- Animated transaction list and polished UI feedback
+- **Dashboard overview** — at-a-glance balance, income, and expense summary cards
+- **Expense breakdown** — category donut chart powered by Recharts
+- **Reports view** — deeper spending analysis and trends over time
+- **Transaction management** — add, edit, and delete transactions via a slide-out drawer
+- **Currency conversion** — switch between ₦, $, €, £, and ₹ with real-life conversion rates applied to existing entries
+- **Dark / light theme switcher** — toggle from the sidebar or header, with your preference remembered
+- **Single-instance toast notifications** — clean, non-stacking feedback for every action
+- **Sidebar navigation** — Dashboard, Reports, and Settings views
+- **Responsive layout** for desktop and mobile screens
+- **Animated transaction list** and polished UI feedback via Framer Motion
 
 ## 💡 Amount Behavior
 
@@ -66,6 +69,7 @@ npm run dev
 
 - React 19
 - Vite 8
+- Recharts
 - Framer Motion
 - Font Awesome Icons
 - Lucide React
@@ -75,19 +79,26 @@ npm run dev
 ## 📁 Project Structure
 
 ```text
-react-expense-tracker/
-├── public/                  # Static assets
+finPulse/
+├── public/                          # Static assets
 ├── src/
-│   ├── assets/              # Static images and shared assets
-│   ├── components/          # UI components
-│   ├── data/                # Categories, icons, and motion variants
-│   ├── utils/               # Formatting helpers
-│   ├── App.jsx              # Main application logic
-│   └── style.css            # Global styles
-├── index.html               # HTML entry file
-├── package.json             # Dependencies and scripts
-├── vite.config.js           # Vite config
-└── README.md                # Project documentation
+│   ├── assets/                      # Static images and shared assets
+│   ├── components/
+│   │   ├── ExpenseCategoryDonut.jsx # Category breakdown chart
+│   │   ├── RecentTransactionsTable.jsx
+│   │   ├── ReportsView.jsx          # Reports & analytics tab
+│   │   ├── SettingsView.jsx         # Currency, theme, and data settings
+│   │   ├── Sidebar.jsx              # Navigation and live balance
+│   │   ├── TopRowCards.jsx          # Summary cards
+│   │   └── TransactionDrawer.jsx    # Add/edit transaction form
+│   ├── data/                        # Categories, icons, and sample transactions
+│   ├── utils/                       # Formatting, currency conversion, and transaction helpers
+│   ├── App.jsx                      # Main application logic
+│   └── style.css                    # Global styles
+├── index.html                       # HTML entry file
+├── package.json                     # Dependencies and scripts
+├── vite.config.js                   # Vite config
+└── README.md                        # Project documentation
 ```
 
 ## 🤝 Contributing
