@@ -158,6 +158,7 @@ export default function AuthScreen({ onAuthenticated, theme, toggleTheme, notice
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="styled-input password-input"
+                maxLength={72}
                 required
               />
               <button

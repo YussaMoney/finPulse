@@ -1632,6 +1632,11 @@ body {
   color: var(--teal);
 }
 
+.currency-pill:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
 .symbol-badge {
   font-weight: 800;
   font-size: 1rem;

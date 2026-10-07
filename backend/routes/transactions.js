@@ -1,6 +1,7 @@
 import { Router } from "express";
 import mongoose from "mongoose";
 import Transaction from "../models/Transaction.js";
+import User from "../models/User.js";
 import { requireAuth } from "../middleware/auth.js";
 import { SUPPORTED_CURRENCIES, convertAmount } from "../utils/currency.js";
 import sampleTransactions from "../utils/sampleTransactions.js";
@@ -9,6 +10,10 @@ const router = Router();
 
 router.use(requireAuth);
 
+const MAX_DESCRIPTION_LENGTH = 120;
+const MAX_CATEGORY_LENGTH = 30;
+const MAX_AMOUNT = 1e12;
+
 function readTransactionInput(body) {
   const description = typeof body?.description === "string" ? body.description.trim() : "";
   const amount = Number(body?.amount);
@@ -16,8 +21,17 @@ function readTransactionInput(body) {
     typeof body?.category === "string" && body.category.trim() ? body.category.trim() : "Other";
 
   if (!description) return { error: "Description is required." };
+  if (description.length > MAX_DESCRIPTION_LENGTH) {
+    return { error: `Description must be ${MAX_DESCRIPTION_LENGTH} characters or fewer.` };
+  }
+  if (category.length > MAX_CATEGORY_LENGTH) {
+    return { error: `Category must be ${MAX_CATEGORY_LENGTH} characters or fewer.` };
+  }
   if (!Number.isFinite(amount) || amount === 0) {
     return { error: "Amount must be a non-zero number." };
+  }
+  if (Math.abs(amount) > MAX_AMOUNT) {
+    return { error: "That amount is too large." };
   }
 
   return { value: { description, amount, category } };
@@ -58,8 +72,12 @@ router.post("/sample", async (req, res) => {
     createdAt: new Date(Date.now() - index * 86_400_000),
   }));
 
-  await Transaction.deleteMany({ user: req.user._id });
-  await Transaction.insertMany(docs);
+  // Insert first, then remove the old rows, so a failed insert never leaves the user with nothing.
+  const inserted = await Transaction.insertMany(docs);
+  await Transaction.deleteMany({
+    user: req.user._id,
+    _id: { $nin: inserted.map((t) => t._id) },
+  });
 
   const transactions = await Transaction.find({ user: req.user._id }).sort({ createdAt: -1 });
   res.status(201).json(transactions);
@@ -73,24 +91,43 @@ router.post("/convert", async (req, res) => {
   }
 
   const from = req.user.currency;
+  let user = req.user;
+
   if (from !== to) {
-    const transactions = await Transaction.find({ user: req.user._id });
-    if (transactions.length > 0) {
-      await Transaction.bulkWrite(
-        transactions.map((t) => ({
-          updateOne: {
-            filter: { _id: t._id, user: req.user._id },
-            update: { $set: { amount: convertAmount(t.amount, from, to) } },
-          },
-        }))
-      );
+    // Only switch if the currency is still what we read. If two conversions race
+    // (e.g. a quick double click), the second one fails here instead of
+    // converting already-converted amounts a second time.
+    user = await User.findOneAndUpdate(
+      { _id: req.user._id, currency: from },
+      { $set: { currency: to } },
+      { new: true }
+    );
+    if (!user) {
+      return res
+        .status(409)
+        .json({ message: "Your currency was just changed. Refresh and try again." });
     }
-    req.user.currency = to;
-    await req.user.save();
+
+    try {
+      const transactions = await Transaction.find({ user: user._id });
+      if (transactions.length > 0) {
+        await Transaction.bulkWrite(
+          transactions.map((t) => ({
+            updateOne: {
+              filter: { _id: t._id, user: user._id },
+              update: { $set: { amount: convertAmount(t.amount, from, to) } },
+            },
+          }))
+        );
+      }
+    } catch (err) {
+      await User.updateOne({ _id: user._id }, { $set: { currency: from } });
+      throw err;
+    }
   }
 
-  const transactions = await Transaction.find({ user: req.user._id }).sort({ createdAt: -1 });
-  res.json({ user: req.user.toPublicJSON(), transactions });
+  const transactions = await Transaction.find({ user: user._id }).sort({ createdAt: -1 });
+  res.json({ user: user.toPublicJSON(), transactions });
 });
 
 // PUT /api/transactions/:id — update one

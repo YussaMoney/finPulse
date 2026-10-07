@@ -7,6 +7,7 @@ const router = Router();
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const MIN_PASSWORD_LENGTH = 8;
+const MAX_PASSWORD_BYTES = 72;
 
 function normalizeEmail(email) {
   return typeof email === "string" ? email.trim().toLowerCase() : "";
@@ -28,6 +29,10 @@ router.post("/register", async (req, res) => {
     return res
       .status(400)
       .json({ message: `Password must be at least ${MIN_PASSWORD_LENGTH} characters.` });
+  }
+  // bcrypt only uses the first 72 bytes; anything longer would be silently ignored.
+  if (Buffer.byteLength(password, "utf8") > MAX_PASSWORD_BYTES) {
+    return res.status(400).json({ message: "Password is too long (max 72 characters)." });
   }
 
   if (await User.exists({ email })) {

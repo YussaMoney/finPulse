@@ -3,6 +3,7 @@ import { RefreshCw, Trash2, Moon, Sun, DollarSign } from "lucide-react";
 export default function SettingsView({
   currencySymbol,
   changeCurrency,
+  isConverting = false,
   loadSampleData,
   clearAllTransactions,
   theme = "dark",
@@ -50,6 +51,8 @@ export default function SettingsView({
                     currencySymbol === c.symbol ? "active-pill" : ""
                   }`}
                   onClick={() => changeCurrency(c.symbol)}
+                  disabled={isConverting}
+                  aria-busy={isConverting}
                 >
                   <span className="symbol-badge">{c.symbol}</span>
                   <span className="symbol-name">{c.name}</span>

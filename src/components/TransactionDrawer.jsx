@@ -186,6 +186,7 @@ export default function TransactionDrawer({
                       value={description}
                       onChange={(e) => setDescription(e.target.value)}
                       required
+                      maxLength={120}
                       className="styled-input"
                     />
                   </div>

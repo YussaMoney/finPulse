@@ -23,6 +23,7 @@ export default function Dashboard({ user, onUserChange, onLogout, theme, toggleT
   const [transactions, setTransactions] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState("");
+  const [isConverting, setIsConverting] = useState(false);
 
   const currencySymbol = user.currency;
   const firstName = user.name.split(" ")[0];
@@ -48,8 +49,9 @@ export default function Dashboard({ user, onUserChange, onLogout, theme, toggleT
   }
 
   async function changeCurrency(newSymbol) {
-    if (newSymbol === currencySymbol) return;
+    if (newSymbol === currencySymbol || isConverting) return;
 
+    setIsConverting(true);
     try {
       const result = await transactionsApi.convertCurrency(newSymbol);
       setTransactions(result.transactions);
@@ -57,6 +59,8 @@ export default function Dashboard({ user, onUserChange, onLogout, theme, toggleT
       toast.success(`Currency converted to ${newSymbol}`, { id: "currency-toast" });
     } catch (err) {
       toast.error(err.message || "Failed to convert currency.", { id: "currency-error" });
+    } finally {
+      setIsConverting(false);
     }
   }
 
@@ -240,6 +244,7 @@ export default function Dashboard({ user, onUserChange, onLogout, theme, toggleT
                 <SettingsView
                   currencySymbol={currencySymbol}
                   changeCurrency={changeCurrency}
+                  isConverting={isConverting}
                   loadSampleData={loadSampleData}
                   clearAllTransactions={clearAllTransactions}
                   theme={theme}

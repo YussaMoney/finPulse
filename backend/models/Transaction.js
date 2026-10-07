@@ -6,7 +6,6 @@ const transactionSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
-      index: true,
     },
     description: {
       type: String,
@@ -25,6 +24,8 @@ const transactionSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
+transactionSchema.index({ user: 1, createdAt: -1 });
 
 const Transaction = mongoose.model("Transaction", transactionSchema);
 

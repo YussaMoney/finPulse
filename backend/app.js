@@ -37,7 +37,10 @@ app.use((err, req, res, next) => {
     return res.status(400).json({ message: err.message });
   }
   if (err.code === 11000) {
-    return res.status(409).json({ message: "That record already exists." });
+    const message = err.keyPattern?.email
+      ? "An account with this email already exists."
+      : "That record already exists.";
+    return res.status(409).json({ message });
   }
 
   console.error(err);
