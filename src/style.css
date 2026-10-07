@@ -115,7 +115,7 @@ body {
 .app-shell {
   display: flex;
   min-height: 100vh;
-  width: 100vw;
+  width: 100%;
   background: transparent;
   position: relative;
 }
@@ -640,6 +640,8 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem 1rem;
   margin-bottom: 1.5rem;
 }
 
@@ -657,6 +659,9 @@ body {
 }
 
 .header-badge {
+  align-self: flex-start;
+  flex-shrink: 0;
+  white-space: nowrap;
   font-size: 0.75rem;
   font-weight: 700;
   padding: 0.3rem 0.75rem;
@@ -860,8 +865,8 @@ body {
 }
 
 .transactions-header {
-  flex-wrap: wrap;
-  gap: 1rem;
+  flex-direction: column;
+  align-items: stretch;
 }
 
 .table-toolbar {
@@ -872,6 +877,8 @@ body {
 }
 
 .search-box {
+  flex: 1;
+  min-width: 180px;
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -899,7 +906,7 @@ body {
   outline: none;
   color: var(--text-main);
   font-size: 0.85rem;
-  width: 160px;
+  width: 100%;
 }
 
 .search-box input::placeholder {
@@ -1031,6 +1038,7 @@ body {
 }
 
 .amount-text {
+  white-space: nowrap;
   font-weight: 800;
   font-size: 0.95rem;
   letter-spacing: -0.01em;
@@ -1719,18 +1727,12 @@ body {
 }
 
 @media (max-width: 1200px) {
-  .top-row-cards {
-    grid-template-columns: 1fr;
-  }
-
-  .main-split-area {
-    grid-template-columns: 1fr;
-  }
-
+  .top-row-cards,
+  .main-split-area,
   .reports-metrics-grid,
   .settings-grid,
   .reports-charts-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 
@@ -1777,6 +1779,29 @@ body {
 
   .main-content-wrapper {
     padding: 1.5rem 1rem 6rem 1rem;
+  }
+
+  .dashboard-top-header {
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .main-heading {
+    font-size: 1.75rem;
+  }
+
+  .combined-flow-card {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .panel-divider {
+    display: none;
+  }
+
+  .main-area-card {
+    padding: 1.25rem;
   }
 
   .fab-button {
