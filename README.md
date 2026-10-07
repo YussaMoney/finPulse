@@ -1,109 +1,185 @@
 # 💰 FinPulse
 
-A personal finance dashboard built with React + Vite. Track income and expenses, visualize spending by category, and manage your transactions — all stored locally in the browser with `localStorage`, so your data persists across refreshes.
-
-## ✨ Features
-
-- **Dashboard overview** — at-a-glance balance, income, and expense summary cards
-- **Expense breakdown** — category donut chart powered by Recharts
-- **Reports view** — deeper spending analysis and trends over time
-- **Transaction management** — add, edit, and delete transactions via a slide-out drawer
-- **Currency conversion** — switch between ₦, $, €, £, and ₹ with real-life conversion rates applied to existing entries
-- **Dark / light theme switcher** — toggle from the sidebar or header, with your preference remembered
-- **Single-instance toast notifications** — clean, non-stacking feedback for every action
-- **Sidebar navigation** — Dashboard, Reports, and Settings views
-- **Responsive layout** for desktop and mobile screens
-- **Animated transaction list** and polished UI feedback via Framer Motion
-
-## 💡 Amount Behavior
-
-- Use a positive amount for income
-- Use a negative amount for expense
-
-The app automatically shows the expense total as a positive number in the summary cards while keeping the transaction logic intact.
+A full-stack personal finance dashboard. Track income and expenses, see your spending by category, and manage transactions from any device. The React + Vite frontend talks to an Express API, which stores everything in MongoDB.
 
 ## 🌐 Live Demo
 
-[Check it live here](https://yussa-reactexpensetracker.vercel.app/)
+[finpulse-teal.vercel.app](https://finpulse-teal.vercel.app)
 
-## 🚀 Quick Start
+## ✨ Features
+
+- **Dashboard overview**: balance, income, expense and transaction-count cards
+- **Expense breakdown**: category donut chart powered by Recharts
+- **Reports view**: deeper spending analysis
+- **Transaction management**: add, edit and delete transactions from a slide-out drawer, with an Income/Expense switch
+- **Persistent storage**: transactions are saved in MongoDB, so they survive refreshes and show up on every device
+- **Search, filter and sort**: by description, category, date or amount, with pagination
+- **Currency conversion**: switch between ₦, $, €, £ and ₹, with stored amounts converted at real-life rates
+- **Dark / light theme**: toggle from the sidebar, header or settings; your choice is remembered
+- **Toast notifications**: one clean, non-stacking message per action
+- **Responsive layout**: works on desktop, tablet and phone
+
+## 🛠️ Tech Stack
+
+**Frontend**
+
+- React 19 + Vite 8
+- Recharts
+- Framer Motion
+- Lucide React and Font Awesome icons
+- React Hot Toast
+
+**Backend**
+
+- Node.js + Express 5
+- MongoDB Atlas + Mongoose
+- dotenv and cors
+
+**Hosting**
+
+- Vercel: the frontend as a static site, the backend as a serverless function
+
+## 🚀 Running Locally
 
 ### Prerequisites
 
-- A modern web browser (Chrome, Firefox, Safari, Edge)
-- Git (for cloning the repository)
-- Node.js (v16 or higher)
-- npm
+- Node.js 18 or higher, and npm
+- A MongoDB Atlas cluster (the free tier is enough) and its connection string
 
-### Installation
-
-1. Clone the repository:
+### 1. Clone the repository
 
 ```bash
-git clone https://github.com/YussaMoney/react-expense-tracker.git
-cd react-expense-tracker
+git clone https://github.com/YussaMoney/finPulse.git
+cd finPulse
 ```
 
-2. Install dependencies:
+### 2. Start the backend
 
 ```bash
+cd backend
 npm install
 ```
 
-3. Start the development server:
+Create `backend/.env`:
+
+```env
+MONGODB_URI=mongodb+srv://<user>:<password>@<cluster>.mongodb.net
+# Optional: restrict which site can call the API. If unset, any origin is allowed.
+CORS_ORIGIN=http://localhost:5173
+```
+
+Then run:
 
 ```bash
 npm run dev
 ```
 
-4. Open the app in your browser at `http://localhost:5173`
+The API runs at `http://localhost:5000`. Visit `http://localhost:5000/api/health` to check it's up.
+
+> In MongoDB Atlas, go to **Network Access** and allow your IP address, or `0.0.0.0/0` for development. Otherwise the connection will be refused.
+
+### 3. Start the frontend
+
+In a second terminal, from the project root:
+
+```bash
+npm install
+cp .env.example .env
+npm run dev
+```
+
+`.env` holds a single variable:
+
+```env
+VITE_API_URL=http://localhost:5000/api
+```
+
+Open `http://localhost:5173` in your browser.
+
+## 🔌 API Endpoints
+
+| Method | Endpoint                | Description              |
+| ------ | ----------------------- | ------------------------ |
+| GET    | `/api/health`           | Health check             |
+| GET    | `/api/transactions`     | List all, newest first   |
+| POST   | `/api/transactions`     | Create a transaction     |
+| PUT    | `/api/transactions/:id` | Update a transaction     |
+| DELETE | `/api/transactions/:id` | Delete a transaction     |
+
+A transaction looks like this:
+
+```json
+{
+  "description": "Grocery Run",
+  "amount": -12000,
+  "category": "Food"
+}
+```
+
+Positive amounts are income and negative amounts are expenses. MongoDB adds `_id`, `createdAt` and `updatedAt` automatically.
+
+## ☁️ Deploying to Vercel
+
+The repo is deployed as **two Vercel projects** that both import this repository.
+
+| Project  | Root Directory | Environment variables                                             |
+| -------- | -------------- | ----------------------------------------------------------------- |
+| Backend  | `backend`      | `MONGODB_URI`, and `CORS_ORIGIN` set to the frontend's URL         |
+| Frontend | `./` (root)    | `VITE_API_URL` set to the backend's URL followed by `/api`         |
+
+- `backend/api/index.js` wraps the Express app as a serverless function, and `backend/vercel.json` sends every request to it.
+- `CORS_ORIGIN` must match the frontend's URL exactly, including `https://` and with no trailing slash.
+- `VITE_` variables are built into the frontend code, so after changing one you need to redeploy the frontend.
+- Every push to `main` redeploys both projects automatically.
 
 ## 📦 Available Scripts
 
-- `npm run dev` — Start the local Vite development server
-- `npm run build` — Create a production build
-- `npm run preview` — Preview the production build locally
-- `npm run lint` — Run ESLint across the project
+**Frontend** (project root)
 
-## 🛠️ Tech Stack
+- `npm run dev`: start the Vite development server
+- `npm run build`: create a production build
+- `npm run preview`: preview the production build locally
+- `npm run lint`: run ESLint
 
-- React 19
-- Vite 8
-- Recharts
-- Framer Motion
-- Font Awesome Icons
-- Lucide React
-- React Hot Toast
-- ESLint
+**Backend** (`backend/`)
+
+- `npm run dev`: start the API with nodemon (auto-restarts on save)
+- `npm start`: start the API with Node
 
 ## 📁 Project Structure
 
 ```text
 finPulse/
-├── public/                          # Static assets
+├── backend/
+│   ├── api/
+│   │   └── index.js          # Vercel serverless entry point
+│   ├── config/
+│   │   └── db.js             # MongoDB connection (cached for serverless)
+│   ├── models/
+│   │   └── Transaction.js    # Mongoose schema
+│   ├── routes/
+│   │   └── transactions.js   # CRUD endpoints
+│   ├── app.js                # Express app (middleware + routes)
+│   ├── index.js              # Local dev server entry point
+│   └── vercel.json           # Sends all requests to the serverless function
+├── public/                   # Static assets
 ├── src/
-│   ├── assets/                      # Static images and shared assets
-│   ├── components/
-│   │   ├── ExpenseCategoryDonut.jsx # Category breakdown chart
-│   │   ├── RecentTransactionsTable.jsx
-│   │   ├── ReportsView.jsx          # Reports & analytics tab
-│   │   ├── SettingsView.jsx         # Currency, theme, and data settings
-│   │   ├── Sidebar.jsx              # Navigation and live balance
-│   │   ├── TopRowCards.jsx          # Summary cards
-│   │   └── TransactionDrawer.jsx    # Add/edit transaction form
-│   ├── data/                        # Categories, icons, and sample transactions
-│   ├── utils/                       # Formatting, currency conversion, and transaction helpers
-│   ├── App.jsx                      # Main application logic
-│   └── style.css                    # Global styles
-├── index.html                       # HTML entry file
-├── package.json                     # Dependencies and scripts
-├── vite.config.js                   # Vite config
-└── README.md                        # Project documentation
+│   ├── api/
+│   │   └── transactions.js   # Frontend API client (fetch wrappers)
+│   ├── components/           # Dashboard, charts, table, drawer, settings
+│   ├── data/                 # Categories, icons, sample transactions
+│   ├── utils/                # Formatting and currency conversion helpers
+│   ├── App.jsx               # Main application logic and state
+│   └── style.css             # Global styles and themes
+├── .env.example              # Frontend environment template
+├── index.html
+├── package.json
+└── vite.config.js
 ```
 
 ## 🤝 Contributing
 
-Contributions are welcome. If you would like to improve the app, feel free to open an issue or submit a pull request.
+Contributions are welcome. Feel free to open an issue or submit a pull request.
 
 ## 👤 Author
 
@@ -119,4 +195,4 @@ For questions or feedback, open a GitHub issue or connect via WhatsApp: [@Yussas
 
 ---
 
-Built with ❤️ using React and Vite.
+Built with ❤️ using React, Express and MongoDB.
