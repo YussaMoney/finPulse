@@ -1,33 +1,32 @@
-const API_URL = `${import.meta.env.VITE_API_URL.replace(/\/+$/, "")}/transactions`;
-
-async function handleResponse(res) {
-  if (!res.ok) {
-    const body = await res.json().catch(() => ({}));
-    throw new Error(body.message || `Request failed with status ${res.status}`);
-  }
-  return res.json();
-}
+import { request } from "./client";
 
 export function getTransactions() {
-  return fetch(API_URL).then(handleResponse);
+  return request("/transactions");
 }
 
 export function createTransaction({ description, amount, category }) {
-  return fetch(API_URL, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ description, amount, category }),
-  }).then(handleResponse);
+  return request("/transactions", { method: "POST", body: { description, amount, category } });
 }
 
 export function updateTransaction(id, { description, amount, category }) {
-  return fetch(`${API_URL}/${id}`, {
+  return request(`/transactions/${id}`, {
     method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ description, amount, category }),
-  }).then(handleResponse);
+    body: { description, amount, category },
+  });
 }
 
 export function deleteTransaction(id) {
-  return fetch(`${API_URL}/${id}`, { method: "DELETE" }).then(handleResponse);
+  return request(`/transactions/${id}`, { method: "DELETE" });
+}
+
+export function clearTransactions() {
+  return request("/transactions", { method: "DELETE" });
+}
+
+export function loadSampleTransactions() {
+  return request("/transactions/sample", { method: "POST" });
+}
+
+export function convertCurrency(to) {
+  return request("/transactions/convert", { method: "POST", body: { to } });
 }
