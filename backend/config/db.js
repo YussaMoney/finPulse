@@ -16,11 +16,16 @@ export function connectDB() {
     const uri = process.env.MONGODB_URI;
 
     if (!uri) {
-      connectionPromise = null;
       throw new Error("MONGODB_URI is not set");
     }
 
-    connectionPromise = mongoose.connect(uri, { dbName: "finpulse" });
+    connectionPromise = mongoose
+      .connect(uri, { dbName: process.env.MONGODB_DB || "finpulse" })
+      .catch((err) => {
+        // Don't cache a failed attempt, or every later request would fail too.
+        connectionPromise = null;
+        throw err;
+      });
   }
 
   return connectionPromise;
