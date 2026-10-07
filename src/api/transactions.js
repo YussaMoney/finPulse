@@ -1,4 +1,4 @@
-const API_URL = `${import.meta.env.VITE_API_URL}/transactions`;
+const API_URL = `${import.meta.env.VITE_API_URL.replace(/\/+$/, "")}/transactions`;
 
 async function handleResponse(res) {
   if (!res.ok) {
